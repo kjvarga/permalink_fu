@@ -123,10 +123,24 @@ module PermalinkFu
       [limit, base]
     end
 
-    def create_unique_permalink
+    # If you need to "seed" the counter to improve performance you can do something
+    # like this in your model.  Useful if you have a lot of items with the same
+    # value on their permalink field.
+    #
+    # alias_method :original_create_unique_permalink, :create_unique_permalink
+    # def create_unique_permalink
+    #   return original_create_unique_permalink unless name =~ %r[^#{Playlist::DEFAULT_PLAYLIST}$]
+    #   counter_seed = Playlist.count(:conditions => { :name => Playlist::DEFAULT_PLAYLIST })
+    #   if counter_seed == 0
+    #     original_create_unique_permalink
+    #   else
+    #     original_create_unique_permalink(counter_seed)
+    #   end
+    # end
+    def create_unique_permalink(counter=1)
       limit, base = create_common_permalink
       return if limit.nil? # nil if the permalink has not changed or :if/:unless fail
-      counter = 1
+
       # oh how i wish i could use a hash for conditions
       conditions = ["#{self.class.permalink_field} = ?", base]
       unless new_record?
